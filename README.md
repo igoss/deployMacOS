@@ -9,7 +9,7 @@
   * _psycopg2==2.7.1_
   * _django-ckeditor_
   * _django-resized_
-  * _image_
+  * _pillow_
 * Раскатка кода project_x
 * Конфигурация проекта
   * _settings.py_
