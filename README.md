@@ -1,10 +1,7 @@
-Скрипт для раскатки dev-версии project_x.
-=====================
-
-### Использование 
+# Использование 
 `$ ./deploy_MacOS.sh`
 
-Выполниться раскатка проекта в текущей директории.
+Выполниться раскатка проекта в текущей директории. <br>
 Раскатка включает в себя:
 * Создание виртуального окружения python3 (venv)
 * Установка библиотек:
@@ -20,17 +17,16 @@
   * _media_
 * Миграция БД
 
-### Перед использованием необходимо установить:
+# Перед использованием необходимо установить:
 * Python 3.5.3
 * PostgreSQL 9.6
 
-##### Python (macOS)
-https://www.python.org/downloads/release/python-353/
-
-_убедиться в наличии pip(3) для python 3.5.3_
+## Python (macOS)
+https://www.python.org/downloads/release/python-353/ <br>
+убедиться в наличии pip(3) для python 3.5.3 <br>
 `$ which pip`
 
-##### PostgreSQL
+## PostgreSQL
 http://postgresapp.com/
 
 После установки необходимо:
@@ -52,6 +48,6 @@ CREATE USER django WITH PASSWORD 'qwerty';
 GRANT ALL PRIVILEGES ON DATABASE django_db TO django;
 ```
 
-Для проверки в pqsl: \connect django_db
-Для просмотра таблиц: \td
+Для проверки в pqsl: `\connect django_db` <br>
+Для просмотра таблиц: `\td`
 
