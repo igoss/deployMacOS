@@ -11,8 +11,8 @@
 echo 'Start deploy django'
 
 echo '--> Create folders.'
-rm -rf $PWD/dev_django && mkdir $PWD/dev_django   && cd "$_"
-rm -rf $PWD/venv_django && mkdir $PWD/venv_django
+rm -rf $PWD/dev_django && mkdir $PWD/dev_django && cd "$_"
+mkdir $PWD/venv_django
 echo '--> OK.'
 
 echo '--> Create && Activate venv.'
