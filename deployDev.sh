@@ -67,7 +67,7 @@ echo '--> OK.'
 echo '--> Download project'
 git init > /dev/null
 git clone git@github.com:igoss/project_x.git
-mkdir $PWD/project_x/makemigrations && touch $PWD/project_x/makemigrations/__init__.py
+mkdir $PWD/project_x/migrations && touch $PWD/project_x/migrations/__init__.py
 echo '--> OK.'
 
 echo '--> Make migrations'
