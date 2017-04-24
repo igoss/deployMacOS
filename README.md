@@ -1,5 +1,11 @@
 # Использование 
-`$ ./deployDev.sh`
+Deploy: `$ ./deployDev.sh <frontend_project> <frontent_branch> <beckend_branch>` <br>
+Run: `$ source ./bin/activate` и `$ python manage.py runserver --insecure` <br>
+
+На вход скрипту передаются 3 параметра: 
+* Название проекта части фронтенд
+* Ветка фронтенд части
+* Ветка бекенд части
 
 Выполниться раскатка проекта в текущей директории. <br>
 Раскатка включает в себя:
@@ -10,7 +16,8 @@
   * _django-ckeditor_
   * _django-resized_
   * _pillow_
-* Раскатку кода project_x
+* Раскатку кода фронтенда
+* Раскатку кода бекенда
 * Конфигурацию проекта
   * _settings.py_
   * _urls.py_
