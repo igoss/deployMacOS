@@ -1,5 +1,5 @@
 # Использование 
-Deploy: `$ ./deployDev.sh <frontend_project> <frontent_branch> <beckend_branch>` <br>
+Deploy: `$ ./deployDev.sh <frontend_project> <frontent_branch> <backend_branch>` <br>
 <br>
 Run: `$ source ./bin/activate` и `$ python manage.py runserver --insecure` <br>
 
