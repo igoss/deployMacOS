@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 #Download and deploy django-project
+#Attention:
+#DATABASE name is hardcoded (name: project_x)
 #Requirements:
 #   -> PSQL install (9.6v)
 #     --> DB: django_db
@@ -8,39 +10,86 @@
 #     --> user: django
 #   -> Python3 (3.5.3v)
 
-frontend=$1
-frontend_branch=$2
-backend_branch=$3
+#Script options:
+#Use -u  | --db_user        --> database username
+#Use -p  | --db_passwd      --> database username password
+#Use -f  | --frontend       --> git project name (app_django frontend part)
+#Use -bb | --backend_branch --> backend deploy branch
+#Use -fb | --frontend_branch--> frontend deploy branch
 
-if [ -z $frontend ]; then
-  echo 'ERROR: Input frontend template'
+#----------------------------------------------------------------------------
+#option parser
+while [[ $# -gt 1 ]]
+do
+key="$1"
+
+case $key in
+    -u|--db_user)
+    DB_USERNAME="$2"
+    shift ;;
+    -p|--db_passwd)
+    DB_PASSWORD="$2"
+    shift ;;
+    -f|--frontend)
+    FRONTEND="$2"
+    shift ;;
+    -bb|--backend_branch)
+    BACKEND_BRANCH="$2"
+    shift ;;
+    -fb|--frontend_branch)
+    FRONTEND_BRANCH="$2"
+    shift ;;
+esac
+shift
+done
+
+
+#----------------------------------------------------------------------------
+#option validator
+if [ -z ${DB_USERNAME} ] && [ -z ${DB_PASSWORD} ]; then
+  echo "ERROR: DB user and user passwd are missed!"
+  echo "--> use -u | -p options."
   exit
 fi
 
-if [ -z $frontend_branch ] || [ -z $backend_branch ]; then
-  echo 'ERROR: Inpunt frontend and backend branches'
-  echo '---->  or input master maseter'
+if [ -z ${FRONTEND_BRANCH} ] && [ -z ${BACKEND_BRANCH} ]; then
+  echo "ERROR: frontend or backend release branch is missed!"
+  echo "--> use -fb | -bb options."
   exit
 fi
 
+if [ -z ${FRONTEND} ]; then
+  echo "ERROR: Frontend project not defined!"
+  echo "--> use -f option."
+  exit
+fi
+
+
+#----------------------------------------------------------------------------
+#initialize environment
 echo 'Start deploy django'
 
 echo '--> Create folders.'
+mkdir -p $PWD/media/tag_group_icons $PWD/media/uploads
 rm -rf $PWD/projectX && mkdir $PWD/projectX && cd "$_"
 mkdir  $PWD/venv_django
 echo '--> OK.'
 
+
+#----------------------------------------------------------------------------
+#initialize django
 echo '--> Create && Activate venv.'
+
 python3.5 -m venv $PWD/venv_django
 source $PWD/venv_django/bin/activate
 echo '--> OK.'
 
 echo '--> Install django and additional libs.'
-pip install django==1.9                                                               &> /dev/null
-pip install psycopg2==2.7.1                                                           &> /dev/null
-pip install django-ckeditor                                                           &> /dev/null
-pip install django-resized                                                            &> /dev/null
-pip install Pillow                                                                    &> /dev/null
+pip install django==1.9         &> /dev/null
+pip install psycopg2==2.7.1     &> /dev/null
+pip install django-ckeditor     &> /dev/null
+pip install django-resized      &> /dev/null
+pip install Pillow              &> /dev/null
 echo '--> OK.'
 
 echo '--> Create project.'
@@ -48,69 +97,106 @@ mkdir $PWD/app_django
 django-admin startproject configuration $PWD/app_django && cd "$_"
 echo '--> OK.'
 
+
+#----------------------------------------------------------------------------
+#configure django
 echo '--> Configure settings.py.'
-cd $PWD/configuration
-sed -i -e "s/sqlite3/postgresql_psycopg2/g" ./settings.py
-sed -i -e "s/'NAME': os.path.join(BASE_DIR, 'db.postgresql_psycopg2'),/'NAME': 'django_db', 'USER': 'django', 'PASSWORD': 'qwerty', 'HOST': 'localhost', 'PORT': '',/g" ./settings.py
-sed -i -e "s/TIME_ZONE = 'UTC'/TIME_ZONE = 'Europe\/Moscow'; DATE_FORMAT = 'd E Y в G:i'/g"                                                                             ./settings.py
-sed -i -e "s/    'django.contrib.staticfiles',/    'django.contrib.staticfiles','backend', 'ckeditor', 'ckeditor_uploader',/g"                                          ./settings.py
-sed -i -e "s/        'DIRS': \\[\\],/'DIRS': [os.path.join(BASE_DIR, '$frontend\/templates\/')],/g"                                                                     ./settings.py
+sed -i -e "s/'UTC'/'Europe\/Moscow'/g" ./configuration/settings.py &> /dev/null
+sed '31,40d' ./configuration/settings.py &> /dev/null
+sed '45,59d' ./configuration/settings.py &> /dev/null
+sed '49,57d' ./configuration/settings.py &> /dev/null
 rm -rf settings.py-e
-echo "STATIC_URL = '/static/'"                                                        >> settings.py
-echo "STATIC_ROOT = os.path.join(BASE_DIR, '$frontend/static/root')"                  >> settings.py
-echo "MEDIA_URL = '/media/'"                                                          >> settings.py
-echo "MEDIA_ROOT = os.path.join(BASE_DIR, 'media')"                                   >> settings.py
-echo "CKEDITOR_UPLOAD_PATH = 'uploads/'"                                              >> settings.py
-echo "STATICFILES_DIRS = (os.path.join(BASE_DIR, '$frontend/static/'),)"              >> settings.py
+
+cat >> $PWD/configuration/settings.py << EOF
+INSTALLED_APPS = [
+  'django.contrib.admin',
+  'django.contrib.auth',
+  'django.contrib.contenttypes',
+  'django.contrib.sessions',
+  'django.contrib.messages',
+  'django.contrib.staticfiles',
+  'backend',
+  'ckeditor',
+  'ckeditor_uploader',
+]
+
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'project_x',
+    'USER': '${DB_USERNAME}',
+    'PASSWORD': '${DB_PASSWORD}',
+    'HOST': 'localhost',
+    'PORT': '',
+  }
+}
+
+TEMPLATES = [
+{
+  'BACKEND': 'django.template.backends.django.DjangoTemplates',
+  'DIRS': [os.path.join(BASE_DIR, '${FRONTEND}/templates/')],
+  'APP_DIRS': True,
+  'OPTIONS': {
+    'context_processors': [
+      'django.template.context_processors.debug',
+      'django.template.context_processors.request',
+      'django.contrib.auth.context_processors.auth',
+      'django.contrib.messages.context_processors.messages',
+      ],
+    },
+  },
+]
+
+DATE_FORMAT = 'd E Y в G:i'
+
+STATIC_URL  = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, '${FRONTEND}/static/'),)
+
+MEDIA_URL  = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, '../../media')
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+
+EOF
 echo '--> OK.'
 
 echo '--> Configure urls.py.'
-rm -rf urls.py && touch urls.py
-echo '# -*- coding: utf-8 -*-'                                                        >> urls.py
-echo 'from django.contrib import admin'                                               >> urls.py
-echo 'from django.conf.urls import url, include'                                      >> urls.py
-echo ''                                                                               >> urls.py
-echo 'from django.conf import settings'                                               >> urls.py
-echo 'from django.conf.urls.static import static'                                     >> urls.py
-echo ''                                                                               >> urls.py
-echo 'urlpatterns = ['                                                                >> urls.py
-echo '    url(r"^admin/", admin.site.urls),'                                          >> urls.py
-echo '    url(r"^ckeditor/", include("ckeditor_uploader.urls")),'                     >> urls.py
-echo '    url(r"", include("backend.urls")),'                                         >> urls.py
-echo ']'                                                                              >> urls.py
-echo 'urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)' >> urls.py
-echo 'urlpatterns += static(settings.MEDIA_URL,  document_root=settings.MEDIA_ROOT)'  >> urls.py
+rm -rf $PWD/configuration/urls.py && touch ./configuration/urls.py
+cat >> $PWD/configuration/urls.py << EOF
+# -*- coding: utf-8 -*-
+from django.contrib import admin
+from django.conf.urls import url, include
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+  url(r"^admin/", admin.site.urls),
+  url(r"^ckeditor/", include("ckeditor_uploader.urls")),
+  url(r"", include("backend.urls")),
+] + static(settings.MEDIA_URL,  document_root=settings.MEDIA_ROOT)
+
+EOF
 echo '--> OK.'
 
-echo '--> Create media'
-cd ..
-mkdir ./media ./media/tag_group_icons ./media/uploads
+#----------------------------------------------------------------------------
+#deploy frontend / backend
+rm -rf .git && git init
+
+echo "--> Download backend: ${BACKEND_BRANCH} branch"
+git clone -b ${BACKEND_BRANCH} git@github.com:igoss/backend.git
+mkdir ./backend/migrations && touch ./backend/migrations/__init__.py
 echo '--> OK.'
 
-rm -rf .git && git init                                                                &> /dev/null
-if [ $backend_branch == "master" ]; then
-  echo '--> Download backend: master branch'
-  git clone git@github.com:igoss/backend.git                                           &> /dev/null
-else
-  echo "--> Download backend: $backend_branch branch"
-  git clone -b $backend_branch git@github.com:igoss/backend.git                        &> /dev/null
-fi
-mkdir $PWD/backend/migrations && touch $PWD/backend/migrations/__init__.py
+echo "--> Download frontend: ${FRONTEND_BRANCH} branch"
+git clone -b ${FRONTEND_BRANCH} git@github.com:igoss/${FRONTEND}.git
 echo '--> OK.'
 
-git init
-if [ $frontend_branch == "master" ]; then
-  echo '--> Download frontend: master branch'
-  git clone git@github.com:igoss/$frontend.git                                         &> /dev/null
-else
-  echo "--> Download frontend: $frontend_branch branch"
-  git clone -b $frontend_branch git@github.com:igoss/$frontend.git                     &> /dev/null
-fi
-echo '--> OK.'
 
+#----------------------------------------------------------------------------
+#migrate database
 echo '--> Make migrations'
 python manage.py makemigrations                                                        &> /dev/null
-python manage.py migrate                                                               &> /dev/null
+python manage.py migrate
 echo '--> OK.'
 
 echo 'FINISH.'
