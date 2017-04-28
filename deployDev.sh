@@ -178,6 +178,7 @@ urlpatterns = [
 EOF
 echo '--> OK.'
 
+
 #----------------------------------------------------------------------------
 #deploy frontend / backend
 rm -rf .git && git init
@@ -195,8 +196,8 @@ echo '--> OK.'
 #----------------------------------------------------------------------------
 #migrate database
 echo '--> Make migrations'
-python manage.py makemigrations                                                        &> /dev/null
-python manage.py migrate
+python manage.py makemigrations  &> /dev/null
+python manage.py migrate         &> /dev/null
 echo '--> OK.'
 
 echo 'FINISH.'
