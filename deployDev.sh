@@ -52,10 +52,12 @@ if [ -z ${DB_USERNAME} ] && [ -z ${DB_PASSWORD} ]; then
   exit
 fi
 
-if [ -z ${FRONTEND_BRANCH} ] && [ -z ${BACKEND_BRANCH} ]; then
-  echo "ERROR: frontend or backend release branch is missed!"
-  echo "--> use -fb | -bb options."
-  exit
+if [ -z ${BACKEND_BRANCH} ]; then
+    BACKEND_BRANCH="master"
+fi
+
+if [ -z ${FRONTEND_BRANCH} ]; then
+    FRONTEND_BRANCH="master"
 fi
 
 if [ -z ${FRONTEND} ]; then
