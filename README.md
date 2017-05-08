@@ -1,12 +1,15 @@
 # Использование 
-Deploy: `$ ./deployDev.sh <frontend_project> <frontent_branch> <backend_branch>` <br>
-<br>
-Run: `$ source ./bin/activate` и `$ python manage.py runserver --insecure` <br>
 
-**На вход скрипту передаются 3 параметра:**
-* Название проекта части фронтенд
-* Ветка фронтенд части
-* Ветка бекенд части
+**На вход скрипт принимает обязательные аргументы:**
+* -u : database_user
+* -p : database_password
+* -f : git frontend project name
+
+**И опциональные:**
+* -bb : релизная ветка backend части
+* -fb : релизная ветка frontend части
+
+_Если аргументы не указаны - по-умолчанию используется ветка **master**_.
 
 Выполнится раскатка проекта в текущей директории. <br>
 **Раскатка включает в себя:**
