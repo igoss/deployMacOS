@@ -40,7 +40,7 @@ https://www.python.org/downloads/release/python-353/ <br>
 ## PostgreSQL
 http://postgresapp.com/
 
-После установки необходимо:
+Перед раскаткой проекта необходимо:
 * Создать БД: django_db
 * Создать пользователя: django _с паролем: qwerty_
 * Пользоваелю django выдать гранты на БД django_db
