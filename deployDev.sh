@@ -104,9 +104,10 @@ echo '--> OK.'
 #configure django
 echo '--> Configure settings.py.'
 sed -i -e "s/'UTC'/'Europe\/Moscow'/g" ./configuration/settings.py &> /dev/null
+sed -i -e "s/'en-us'/'ru-ru'/g"        ./configuration/settings.py &> /dev/null
 sed -i -e '55,70d' ./configuration/settings.py &> /dev/null
 sed -i -e '57,68d' ./configuration/settings.py &> /dev/null
-sed -i -e '93d' ./configuration/settings.py &> /dev/null
+sed -i -e '93d'    ./configuration/settings.py &> /dev/null
 rm -rf settings.py-e
 
 cat >> $PWD/configuration/settings.py << EOF
