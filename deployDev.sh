@@ -92,6 +92,7 @@ pip install psycopg2==2.7.1     &> /dev/null
 pip install django-ckeditor     &> /dev/null
 pip install django-resized      &> /dev/null
 pip install Pillow              &> /dev/null
+pip install python-memcache     &> /dev/null
 echo '--> OK.'
 
 echo '--> Create project.'
